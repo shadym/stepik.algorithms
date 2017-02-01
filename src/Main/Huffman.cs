@@ -53,7 +53,7 @@ namespace Stepic.Algorythms
         }
     }
 
-    public class Haffman
+    public class Huffman
     {
         public Node CreateTree(IEnumerable<Node> nodes)
         {
@@ -94,15 +94,15 @@ namespace Stepic.Algorythms
         }
     }
 
-    public class Task425
+    public class Task4
     {
-        public static void Run()
+        public static void RunHuffmanEncode()
         {
-            var input = "a"; //Console.ReadLine();
+            var input = Console.ReadLine();
             var nodes = input.GroupBy(l=>l).Select(g=> new Node(g.Count(), g.Key));
-            var haffman = new Haffman();
-            var root = haffman.CreateTree(nodes);
-            var codes = haffman.CalculateCodes(root);
+            var huffman = new Huffman();
+            var root = huffman.CreateTree(nodes);
+            var codes = huffman.CalculateCodes(root);
 
             var encoded = string.Join("", input.Select(c=>codes[c]));
 
@@ -112,6 +112,41 @@ namespace Stepic.Algorythms
                 Console.WriteLine($"{code.Key}: {code.Value}");
             }
             Console.WriteLine(encoded);
+        }
+
+        public static void RunHuffmanDecode()
+        {
+            var encoded = string.Empty;
+            var decoded = string.Empty;
+            var codes = new Dictionary<string, char>();
+            Console.ReadLine(); // we don't need 1st line
+            string line;
+            while ((line = Console.ReadLine()) != null && line != string.Empty)
+            {
+                var data = line.Split(':');
+                if (data.Count() == 2)
+                {
+                    codes.Add(data[1].Trim(), data[0][0]);
+                
+                }
+                else
+                {
+                    encoded = line;    
+                }
+            }
+
+            var accumulator = string.Empty;
+            foreach (var c in encoded)
+            {
+                accumulator += c;
+                if (codes.ContainsKey(accumulator))
+                {
+                    decoded += codes[accumulator];
+                    accumulator = string.Empty;
+                }
+            }
+
+            Console.WriteLine(decoded);
         }
     }
 
