@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Stepic.Algorythms
+namespace Stepic.Algorithms
 {
     public class Node
     {
@@ -116,7 +116,7 @@ namespace Stepic.Algorythms
 
         private void SiftUp(int index)
         {
-            while (data[Parent(index)].CompareTo(data[index]) > 0 && index > 1)
+            while (index > 1 && data[Parent(index)].CompareTo(data[index]) > 0)
             {
                 Swap(index, Parent(index));
                 index = Parent(index);
@@ -125,21 +125,22 @@ namespace Stepic.Algorythms
 
         private void SiftDown(int index)
         {
-            while (RightChild(index) <= heapSize)
+            while (LeftChild(index) <= heapSize)
             {
-                var left = data[LeftChild(index)];
-                var right = data[RightChild(index)];
-                var item = data[index];
-                var minimumIndex = left.CompareTo(right) < 0 && left.CompareTo(item) < 0 ? LeftChild(index) :
-                    right.CompareTo(left) < 0 && right.CompareTo(item) < 0 ? RightChild(index) : index;
+                var minimumChildIndex = LeftChild(index);
 
-                if (minimumIndex == index)
+                if (RightChild(index) <= heapSize && data[RightChild(index)].CompareTo(data[minimumChildIndex]) < 0)
+                {
+                    minimumChildIndex = RightChild(index);
+                }
+
+                if (data[minimumChildIndex].CompareTo(data[index]) >= 0)
                 {
                     break;
                 }
 
-                Swap(minimumIndex, index);
-                index = minimumIndex;
+                Swap(minimumChildIndex, index);
+                index = minimumChildIndex;
             }
         }
 

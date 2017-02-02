@@ -1,4 +1,4 @@
-﻿namespace Stepic.Algorythms
+﻿namespace Stepic.Algorithms
 {
     public class Application
     {
