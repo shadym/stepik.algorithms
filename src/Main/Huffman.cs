@@ -31,11 +31,11 @@ namespace Stepic.Algorythms
         }
     }
 
-    public class PriorityQueue<T>
+    public class ListPriorityQueue<T>
     {
         private List<Tuple<int, T>> items;
 
-        public PriorityQueue()
+        public ListPriorityQueue()
         {
             items = new List<Tuple<int, T>>();
         }
@@ -53,11 +53,96 @@ namespace Stepic.Algorythms
         }
     }
 
+    public class BinaryHeap<T> where T: IComparable
+    {
+        private List<T> data;
+        private int heapSize = 0;
+
+        public BinaryHeap()
+        {
+            data = new List<T>();
+            data.Add(default(T)); // add zero-indexed item to make indexes start from one
+        }
+
+        public void Insert(T item)
+        {
+            heapSize++;
+            data.Insert(heapSize, item);
+            SiftUp(heapSize);
+        }
+
+        public T ExtractMin()
+        {
+            if (heapSize < 1)
+            {
+                return default(T);
+            }
+            var min = data[1];
+            Swap(1, heapSize);
+            heapSize--;
+            SiftDown(1);
+            return min;
+        }
+
+
+        private void Swap(int indexA, int indexB)
+        {
+            var temp = data[indexA];
+            data[indexA] = data[indexB];
+            data[indexB] = temp;
+        }
+
+        private int Parent(int index)
+        {
+            return index/2;
+        }
+
+        private int LeftChild(int index)
+        {
+            return index * 2;
+        }
+
+        private int RightChild(int index)
+        {
+            return index * 2 + 1;
+        }
+
+        private void SiftUp(int index)
+        {
+            while (data[Parent(index)].CompareTo(data[index]) > 0 && index > 1)
+            {
+                Swap(index, Parent(index));
+                index = Parent(index);
+            }
+        }
+
+        private void SiftDown(int index)
+        {
+            while (RightChild(index) <= heapSize)
+            {
+                var left = data[LeftChild(index)];
+                var right = data[RightChild(index)];
+                var item = data[index];
+                var minimumIndex = left.CompareTo(right) < 0 && left.CompareTo(item) < 0 ? LeftChild(index) :
+                    right.CompareTo(left) < 0 && right.CompareTo(item) < 0 ? RightChild(index) : index;
+
+                if (minimumIndex == index)
+                {
+                    break;
+                }
+
+                Swap(minimumIndex, index);
+                index = minimumIndex;
+            }
+        }
+
+    }
+
     public class Huffman
     {
         public Node CreateTree(IEnumerable<Node> nodes)
         {
-            var queue = new PriorityQueue<Node>();
+            var queue = new ListPriorityQueue<Node>();
             foreach (var node in nodes)
             {
                 queue.Insert(node.Value, node);
@@ -147,6 +232,25 @@ namespace Stepic.Algorythms
             }
 
             Console.WriteLine(decoded);
+        }
+
+        public static void RunPriorityQueue()
+        {
+            var queue = new BinaryHeap<int>();
+            Console.ReadLine();
+            string line;
+            while ((line = Console.ReadLine()) != null && line != string.Empty)
+            {
+                if (line[0] == 'I')
+                {
+                    var value = int.Parse(line.Substring(7));
+                    queue.Insert(-value);
+                }
+                else
+                {
+                    Console.WriteLine(-queue.ExtractMin());
+                }
+            }
         }
     }
 

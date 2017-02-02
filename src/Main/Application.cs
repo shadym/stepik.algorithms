@@ -4,7 +4,7 @@
     {
         public static void Main(string[] args)
         {
-            Task4.RunHuffmanDecode();
+            Task4.RunPriorityQueue();
         }
     }
 }
