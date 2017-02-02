@@ -67,7 +67,14 @@ namespace Stepic.Algorythms
         public void Insert(T item)
         {
             heapSize++;
-            data.Insert(heapSize, item);
+            if (heapSize < data.Count())
+            {
+                data[heapSize] = item;
+            }
+            else
+            {
+                data.Add(item);
+            }
             SiftUp(heapSize);
         }
 
