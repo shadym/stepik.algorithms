@@ -20,7 +20,7 @@ namespace Stepic.Algorithms
                 a.AddLast(merged);
                 count--;
             }
-            
+
             return inversions;
         }
 
@@ -74,6 +74,31 @@ namespace Stepic.Algorithms
             }
 
             // get some element
+            var m = Partition(a, l, r);
+
+
+            QuickSort(a, l, m - 1);
+            QuickSort(a, m + 1, r);
+        }
+
+        public static void QuickSort2(int[] a, int l, int r)
+        {
+            if (l >= r)
+            {
+                return;
+            }
+
+            var pivot = new Random().Next(l, r);
+            // get some element
+            var p = Partition3(a, l, r, pivot);
+
+
+            QuickSort(a, l, p.Item1 - 1);
+            QuickSort(a, p.Item2 + 1, r);
+        }
+
+        public static int Partition(int[] a, int l, int r)
+        {
             var m = l + (r - l) / 2;
             Swap(a, l, m);
 
@@ -87,10 +112,45 @@ namespace Stepic.Algorithms
                     j++;
                 }
             }
+
             Swap(a, j, l);
 
-            QuickSort(a, l, m - 1);
-            QuickSort(a, m + 1, r);
+            return m;
+        }
+
+        public static Tuple<int, int> Partition3(int[] a, int l, int r, int pivot)
+        {
+            if (l >= r)
+            {
+                throw new ArgumentException("l >= r");
+            }
+
+            var j = l + 1; // > pivot
+            var k = l + 1; // == pivot
+            for (int i = l + 1; i <= r; i++)
+            {
+                // move all elements < m to left.
+                if (a[i] < pivot)
+                {
+                    Swap(a, i, j);
+                    j++;
+                    k++;
+                    if (k > j)
+                    {
+                        Swap(a, i, k - 1);
+                    }
+                }
+                else if (a[i] == pivot)
+                {
+                    Swap(a, i, k);
+                    k++;
+                }
+            }
+
+            Swap(a, l, j - 1);
+            j--;
+
+            return new Tuple<int, int>(j, k);
         }
     }
 
@@ -100,11 +160,11 @@ namespace Stepic.Algorithms
         {
             var n = int.Parse(Console.ReadLine());
             var fullN = GetNextPowerOfTwo(n);
-            var items = Console.ReadLine().Split().Select(i => new int[] {int.Parse(i)} );
+            var items = Console.ReadLine().Split().Select(i => new int[] { int.Parse(i) });
             var a = new LinkedList<int[]>(items);
             while (n < fullN)
             {
-                a.AddLast(new int[] {int.MaxValue});
+                a.AddLast(new int[] { int.MaxValue });
                 n++;
             }
 
@@ -114,7 +174,113 @@ namespace Stepic.Algorithms
 
         public static int GetNextPowerOfTwo(int num)
         {
-            return (int)Math.Pow(2, Math.Ceiling(Math.Log(num)/Math.Log(2)) );
+            return (int)Math.Pow(2, Math.Ceiling(Math.Log(num) / Math.Log(2)));
+        }
+    }
+
+    public static class LinesAndPoints
+    {
+        internal static int GetIntersectionNumber(int[] lineStarts, int[] lineEnds, int point)
+        {
+            var lineCount = lineStarts.Length;
+
+            //for (var j = 0; j < points.Count; j++)
+            {
+                //var point = points[j];
+                var startLess = 0;
+                var startEqual = 0;
+                var endLess = 0;
+                var endEqual = 0;
+                for (int i = 0; i < lineCount; i++)
+                {
+                    if (lineStarts[i] < point)
+                    {
+                        startLess++;
+                    }
+                    else if (lineStarts[i] == point)
+                    {
+                        startEqual++;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                for (int i = 0; i < lineCount; i++)
+                {
+                    if (lineEnds[i] < point)
+                    {
+                        endLess++;
+                    }
+                    else if (lineEnds[i] == point)
+                    {
+                        endEqual++;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                var result = startLess - endLess + startEqual;
+                return result;
+            }
+        }
+    }
+
+    public static class Task65
+    {
+        public static void Run()
+        {
+            var data = Console.ReadLine().Split();
+            var n = int.Parse(data[0]);
+            var m = int.Parse(data[1]);
+
+            var lineStarts = new int[n];
+            var lineEnds = new int[n];
+            var points = new int[m];
+
+            for (int i = 0; i < n; i++)
+            {
+                data = Console.ReadLine().Split();
+                lineStarts[i] = int.Parse(data[0]);
+                lineEnds[i] = int.Parse(data[1]);
+            }
+
+            //lineStarts.Sort();
+            //lineEnds.Sort();
+
+            Sort.QuickSort2(lineStarts, 0, n - 1);
+            Sort.QuickSort2(lineEnds, 0, n - 1);
+
+            var cache = new Dictionary<int, int>(m);
+
+            Console.ReadLine()
+                .Split()
+                .Select(int.Parse)
+                .Select(point =>
+                {
+                    var count = 0;
+                    if (!cache.ContainsKey(point))
+                    {
+                        count = LinesAndPoints.GetIntersectionNumber(lineStarts, lineEnds, point);
+                        cache.Add(point, count);
+                    }
+                    else
+                    {
+                        count = cache[point];
+                    }
+                    return count;
+
+                })
+                .ForEach(num => Console.Write($"{num} "));
+        }
+
+        public static void ForEach<T>(this IEnumerable<T> @this, Action<T> action)
+        {
+            foreach (var x in @this)
+                action(x);
         }
     }
 }
