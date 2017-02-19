@@ -182,50 +182,11 @@ namespace Stepic.Algorithms
     {
         internal static int GetIntersectionNumber(int[] lineStarts, int[] lineEnds, int point)
         {
-            var lineCount = lineStarts.Length;
+            var startLessOrEqual = Search.LessCount(lineStarts, point, true);
+            var endLess = Search.LessCount(lineEnds, point, false);
 
-            //for (var j = 0; j < points.Count; j++)
-            {
-                //var point = points[j];
-                var startLess = 0;
-                var startEqual = 0;
-                var endLess = 0;
-                var endEqual = 0;
-                for (int i = 0; i < lineCount; i++)
-                {
-                    if (lineStarts[i] < point)
-                    {
-                        startLess++;
-                    }
-                    else if (lineStarts[i] == point)
-                    {
-                        startEqual++;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-
-                for (int i = 0; i < lineCount; i++)
-                {
-                    if (lineEnds[i] < point)
-                    {
-                        endLess++;
-                    }
-                    else if (lineEnds[i] == point)
-                    {
-                        endEqual++;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-
-                var result = startLess - endLess + startEqual;
-                return result;
-            }
+            var result = startLessOrEqual - endLess;
+            return result;
         }
     }
 
@@ -248,6 +209,55 @@ namespace Stepic.Algorithms
                 lineEnds[i] = int.Parse(data[1]);
             }
 
+            // Array.Sort(lineStarts);
+            // Array.Sort(lineEnds);
+
+            Sort.QuickSort2(lineStarts, 0, n - 1);
+            Sort.QuickSort2(lineEnds, 0, n - 1);
+
+            //var cache = new Dictionary<int, int>(m);
+
+            Console.ReadLine()
+                .Split()
+                .Select(int.Parse)
+                .Select(point => LinesAndPoints.GetIntersectionNumber(lineStarts, lineEnds, point))
+                // .Select(point =>
+                // {
+                //     var count = 0;
+                //     if (!cache.ContainsKey(point))
+                //     {
+                //         count = LinesAndPoints.GetIntersectionNumber(lineStarts, lineEnds, point);
+                //         cache.Add(point, count);
+                //     }
+                //     else
+                //     {
+                //         count = cache[point];
+                //     }
+                //     return count;
+
+                // })
+                .ForEach(num => Console.Write($"{num} "));
+        }
+
+        public static void ForEach<T>(this IEnumerable<T> @this, Action<T> action)
+        {
+            foreach (var x in @this)
+                action(x);
+        }
+
+        public static void Test(int n = 50000, int m = 50000, int maxCoordinate = 100000000)
+        {
+            var rand = new Random();
+
+            var lineStarts = new int[n];
+            var lineEnds = new int[n];
+
+            for (int i = 0; i < n; i++)
+            {
+                lineStarts[i] = rand.Next(0, maxCoordinate);
+                lineEnds[i] = rand.Next(0, maxCoordinate);
+            }
+
             //lineStarts.Sort();
             //lineEnds.Sort();
 
@@ -256,9 +266,9 @@ namespace Stepic.Algorithms
 
             var cache = new Dictionary<int, int>(m);
 
-            Console.ReadLine()
-                .Split()
-                .Select(int.Parse)
+            Enumerable
+                .Range(0, m)
+                .Select(x => rand.Next(maxCoordinate))
                 .Select(point =>
                 {
                     var count = 0;
@@ -274,13 +284,18 @@ namespace Stepic.Algorithms
                     return count;
 
                 })
-                .ForEach(num => Console.Write($"{num} "));
+                .ToList();
+            //.ForEach(num => Console.Write($"{num} "));
         }
 
-        public static void ForEach<T>(this IEnumerable<T> @this, Action<T> action)
+        public static void RunTest()
         {
-            foreach (var x in @this)
-                action(x);
+            var sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
+            Test(3, 3, 0);
+            //Test(100, 100, 100);
+            sw.Stop();
+            System.Console.WriteLine($"Time elapsed: {sw.ElapsedMilliseconds}");
         }
     }
 }
