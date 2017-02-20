@@ -73,9 +73,7 @@ namespace Stepic.Algorithms
                 return;
             }
 
-            // get some element
             var m = Partition(a, l, r);
-
 
             QuickSort(a, l, m - 1);
             QuickSort(a, m + 1, r);
@@ -87,11 +85,8 @@ namespace Stepic.Algorithms
             {
                 return;
             }
-
-            //var pivot = new Random().Next(l, r);
-            // get some element
+            
             var p = Partition3(a, l, r);
-
 
             QuickSort(a, l, p.Item1 - 1);
             QuickSort(a, p.Item2, r);
@@ -244,7 +239,6 @@ namespace Stepic.Algorithms
 
             var lineStarts = new int[n];
             var lineEnds = new int[n];
-            var points = new int[m];
 
             for (int i = 0; i < n; i++)
             {
@@ -253,34 +247,16 @@ namespace Stepic.Algorithms
                 lineEnds[i] = int.Parse(data[1]);
             }
 
-            // Array.Sort(lineStarts);
-            // Array.Sort(lineEnds);
-
             Sort.QuickSort(lineStarts, 0, n - 1);
             Sort.QuickSort(lineEnds, 0, n - 1);
 
-            //var cache = new Dictionary<int, int>(m);
+            var points = Console.ReadLine().Split();
+            for (var i = 0; i < points.Length; i++)
+            {
+                var num = LinesAndPoints.GetIntersectionNumber(lineStarts, lineEnds, int.Parse(points[i]));
+                Console.Write($"{num} ");
+            }
 
-            Console.ReadLine()
-                .Split()
-                .Select(int.Parse)
-                .Select(point => LinesAndPoints.GetIntersectionNumber(lineStarts, lineEnds, point))
-                // .Select(point =>
-                // {
-                //     var count = 0;
-                //     if (!cache.ContainsKey(point))
-                //     {
-                //         count = LinesAndPoints.GetIntersectionNumber(lineStarts, lineEnds, point);
-                //         cache.Add(point, count);
-                //     }
-                //     else
-                //     {
-                //         count = cache[point];
-                //     }
-                //     return count;
-
-                // })
-                .ForEach(num => Console.Write($"{num} "));
         }
 
         public static void ForEach<T>(this IEnumerable<T> @this, Action<T> action)
@@ -306,8 +282,10 @@ namespace Stepic.Algorithms
             Sort.QuickSort2(lineEnds, 0, n - 1);
 
             var cache = new Dictionary<int, int>(m);
+            var getFromCache = 0;
+            var algorithmFails = 0;
 
-            Enumerable
+            var counts = Enumerable
                 .Range(0, m)
                 .Select(x => rand.Next(-maxCoordinate, maxCoordinate))
                 .Select(point =>
@@ -318,33 +296,45 @@ namespace Stepic.Algorithms
                     {
                         count = LinesAndPoints.GetIntersectionNumber(lineStarts, lineEnds, point);
                         //countNaive = LinesAndPoints.GetIntersectionNumberNaive(lineStarts, lineEnds, point);
-                        if (count == countNaive)
+                        if (count == countNaive || true)
                         {
                             cache.Add(point, count);
                         }
                         else
                         {
+                            algorithmFails++;
                             //Console.WriteLine($"Error! {count} != {countNaive}");
                         }
                     }
                     else
                     {
                         count = cache[point];
+                        getFromCache++;
                     }
                     return count;
 
                 })
                 .ToList();
                 //.ForEach(num => Console.Write($"{num} "));
+
+                Console.WriteLine($"{cache.Count} elements in cache. {getFromCache} times get from cache");
+                Console.WriteLine($"{counts.Count} points processed");
+                Console.WriteLine($"{algorithmFails} times algo failed");
+                Console.WriteLine("\n------------------------\n\n");
         }
 
         public static void RunTest()
         {
+            var runCount = 10;
+
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
-            Test();
+            for (int i = 0; i < runCount; i++)
+            {
+                Test(50000, 50000, 10);
+            }
             sw.Stop();
-            System.Console.WriteLine($"\n\nTime elapsed: {sw.ElapsedMilliseconds}");
+            System.Console.WriteLine($"\n\nAvg time elapsed: {sw.ElapsedMilliseconds/runCount} ({runCount} runs)");
         }
     }
 }
