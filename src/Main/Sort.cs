@@ -88,13 +88,13 @@ namespace Stepic.Algorithms
                 return;
             }
 
-            var pivot = new Random().Next(l, r);
+            //var pivot = new Random().Next(l, r);
             // get some element
-            var p = Partition3(a, l, r, pivot);
+            var p = Partition3(a, l, r);
 
 
             QuickSort(a, l, p.Item1 - 1);
-            QuickSort(a, p.Item2 + 1, r);
+            QuickSort(a, p.Item2, r);
         }
 
         public static int Partition(int[] a, int l, int r)
@@ -115,10 +115,10 @@ namespace Stepic.Algorithms
 
             Swap(a, j, l);
 
-            return m;
+            return j;
         }
 
-        public static Tuple<int, int> Partition3(int[] a, int l, int r, int pivot)
+        public static Tuple<int, int> Partition3(int[] a, int l, int r)
         {
             if (l >= r)
             {
@@ -130,7 +130,7 @@ namespace Stepic.Algorithms
             for (int i = l + 1; i <= r; i++)
             {
                 // move all elements < m to left.
-                if (a[i] < pivot)
+                if (a[i] < a[l])
                 {
                     Swap(a, i, j);
                     j++;
@@ -140,7 +140,7 @@ namespace Stepic.Algorithms
                         Swap(a, i, k - 1);
                     }
                 }
-                else if (a[i] == pivot)
+                else if (a[i] == a[l])
                 {
                     Swap(a, i, k);
                     k++;
@@ -188,6 +188,50 @@ namespace Stepic.Algorithms
             var result = startLessOrEqual - endLess;
             return result;
         }
+
+        internal static int GetIntersectionNumberNaive(int[] lineStarts, int[] lineEnds, int point)
+        {
+            var lineCount = lineStarts.Length;
+            var startLess = 0;
+            var startEqual = 0;
+            var endLess = 0;
+            var endEqual = 0;
+
+            for (int i = 0; i < lineCount; i++)
+            {
+                if (lineStarts[i] < point)
+                {
+                    startLess++;
+                }
+                else if (lineStarts[i] == point)
+                {
+                    startEqual++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            for (int i = 0; i < lineCount; i++)
+            {
+                if (lineEnds[i] < point)
+                {
+                    endLess++;
+                }
+                else if (lineEnds[i] == point)
+                {
+                    endEqual++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            var result = startLess - endLess + startEqual;
+            return result;
+        }
     }
 
     public static class Task65
@@ -212,8 +256,8 @@ namespace Stepic.Algorithms
             // Array.Sort(lineStarts);
             // Array.Sort(lineEnds);
 
-            Sort.QuickSort2(lineStarts, 0, n - 1);
-            Sort.QuickSort2(lineEnds, 0, n - 1);
+            Sort.QuickSort(lineStarts, 0, n - 1);
+            Sort.QuickSort(lineEnds, 0, n - 1);
 
             //var cache = new Dictionary<int, int>(m);
 
@@ -254,12 +298,9 @@ namespace Stepic.Algorithms
 
             for (int i = 0; i < n; i++)
             {
-                lineStarts[i] = rand.Next(0, maxCoordinate);
-                lineEnds[i] = rand.Next(0, maxCoordinate);
+                lineStarts[i] = rand.Next(-maxCoordinate, maxCoordinate);
+                lineEnds[i] = rand.Next(-maxCoordinate, maxCoordinate);
             }
-
-            //lineStarts.Sort();
-            //lineEnds.Sort();
 
             Sort.QuickSort2(lineStarts, 0, n - 1);
             Sort.QuickSort2(lineEnds, 0, n - 1);
@@ -268,14 +309,23 @@ namespace Stepic.Algorithms
 
             Enumerable
                 .Range(0, m)
-                .Select(x => rand.Next(maxCoordinate))
+                .Select(x => rand.Next(-maxCoordinate, maxCoordinate))
                 .Select(point =>
                 {
                     var count = 0;
+                    var countNaive = 0;
                     if (!cache.ContainsKey(point))
                     {
                         count = LinesAndPoints.GetIntersectionNumber(lineStarts, lineEnds, point);
-                        cache.Add(point, count);
+                        //countNaive = LinesAndPoints.GetIntersectionNumberNaive(lineStarts, lineEnds, point);
+                        if (count == countNaive)
+                        {
+                            cache.Add(point, count);
+                        }
+                        else
+                        {
+                            //Console.WriteLine($"Error! {count} != {countNaive}");
+                        }
                     }
                     else
                     {
@@ -285,17 +335,16 @@ namespace Stepic.Algorithms
 
                 })
                 .ToList();
-            //.ForEach(num => Console.Write($"{num} "));
+                //.ForEach(num => Console.Write($"{num} "));
         }
 
         public static void RunTest()
         {
             var sw = new System.Diagnostics.Stopwatch();
             sw.Start();
-            Test(3, 3, 0);
-            //Test(100, 100, 100);
+            Test();
             sw.Stop();
-            System.Console.WriteLine($"Time elapsed: {sw.ElapsedMilliseconds}");
+            System.Console.WriteLine($"\n\nTime elapsed: {sw.ElapsedMilliseconds}");
         }
     }
 }
