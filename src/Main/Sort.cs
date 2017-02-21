@@ -147,6 +147,26 @@ namespace Stepic.Algorithms
 
             return new Tuple<int, int>(j, k);
         }
+
+        public static int[] CountSort(int[] A, int maxValue)
+        {   
+            var sorted = new int[A.Length];
+            var B = new int[maxValue];
+            for (int i = 0; i < A.Length; i++)
+            {
+                B[A[i] - 1]++;
+            }
+            for (int i = 1; i < maxValue; i++)
+            {
+                B[i] += B[i - 1];
+            }
+            for (int i = A.Length - 1; i > -1; i--)
+            {
+                sorted[B[A[i] - 1] - 1] = A[i];
+                B[A[i] - 1]--;
+            }
+            return sorted;
+        }
     }
 
     public static class Task64
@@ -335,6 +355,16 @@ namespace Stepic.Algorithms
             }
             sw.Stop();
             System.Console.WriteLine($"\n\nAvg time elapsed: {sw.ElapsedMilliseconds/runCount} ({runCount} runs)");
+        }
+    }
+
+    public static class Task68
+    {
+        public static void Run()
+        {
+            Console.ReadLine();
+            var data = Console.ReadLine().Split().Select(int.Parse).ToArray();
+            Console.WriteLine(string.Join(" ", Sort.CountSort(data, 10)));
         }
     }
 }
