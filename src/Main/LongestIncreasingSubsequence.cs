@@ -35,7 +35,9 @@ namespace Stepic.Algorithms
         public static void Run()
         {
             var n = int.Parse(Console.ReadLine());
-            var nums = Console.ReadLine().Split().ToArray();
+            var nums = Console.ReadLine().Split().Select(int.Parse).ToArray();
+            var res = LongestIncreasingSubsequence.GetLongestIncreasingSubsequence(nums);
+            Console.WriteLine(res);
         }
     }
 }
