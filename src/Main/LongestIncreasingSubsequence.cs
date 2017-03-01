@@ -50,21 +50,51 @@ namespace Stepic.Algorithms
                 {
                     t[0] = i;
                 }
-                else
+                else if (a[i] != a[t[0]] && a[i] != a[t[len - 1]])
                 {
-                    // find new place for element
-                    for (int j = 0; j < len; j++)
+                    // use binary search
+                    var pos = -1;
+                    var l = 0;
+                    var r = len - 1;
+                    while (l <= r)
                     {
-                        if (a[i] == a[t[j]])
+                        var m = l + (r - l) / 2;
+                        var mid = a[t[m]];
+                        if (mid == a[i])
                         {
                             break;
                         }
-                        else if (a[i] < a[t[j]])
+                        else if (mid < a[i])
                         {
-                            t[j] = i;
-                            break;
+                            if (m < r && a[t[m + 1]] > a[i])
+                            {
+                                pos = m + 1;
+                                break;
+                            }
+                            else
+                            {
+                                l = m + 1;
+                            }
+                        }
+                        else if (mid > a[i])
+                        {
+                            if (m > l && a[t[m - 1]] < a[i])
+                            {
+                                pos = m;
+                                break;
+                            }
+                            else
+                            {
+                                r = m - 1;
+                            }
                         }
                     }
+                    if (pos != -1)
+                    {
+                        t[pos] = i;
+                    }
+
+
                 }
             }
 
@@ -77,10 +107,10 @@ namespace Stepic.Algorithms
         public static void Run()
         {
             var rand = new Random();
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 1000000; i++)
             {
-                var nums = Enumerable.Range(0, 10).Select(n => rand.Next(0, 10)).ToArray();
-                var nums1 = new [] {7, 0, 5, 0, 1};
+                var nums = Enumerable.Range(0, 20).Select(n => rand.Next(0, 10)).ToArray();
+                var nums1 = new[] {1, 6, 7, 2, 6, 7};
                 var res1 = LongestIncreasingSubsequence.GetLongestIncreasingSubsequence(nums);
                 var res2 = LongestIncreasingSubsequence.GetLongestIncreasingSubsequenceNLogN(nums);
                 if (res1 != res2)
