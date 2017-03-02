@@ -128,7 +128,7 @@ namespace Stepic.Algorithms
                     t[0] = i;
                     restore[i] = -1;
                 }
-                else if (a[i] != a[t[0]])
+                else
                 {
                     // use binary search
                     var pos = -1;
